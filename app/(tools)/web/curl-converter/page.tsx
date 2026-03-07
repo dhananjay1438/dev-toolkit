@@ -97,18 +97,19 @@ function generatePython(parsed: ReturnType<typeof parseCurlCommand>) {
       code += "}\n\n"
   }
 
+  const headerArg = Object.keys(parsed.headers).length > 0 ? ", headers=headers" : ""
+
   if (parsed.data) {
       // Attempt to pretty print if it's JSON
       try {
           const jsonObj = JSON.parse(parsed.data)
           code += `json_data = ${JSON.stringify(jsonObj, null, 4)}\n\n`
-          code += `response = requests.${parsed.method.toLowerCase()}('${parsed.url}', headers=headers, json=json_data)\n`
+          code += `response = requests.${parsed.method.toLowerCase()}('${parsed.url}'${headerArg}, json=json_data)\n`
       } catch {
           code += `data = '${parsed.data.replace(/'/g, "\\'")}'\n\n`
-          code += `response = requests.${parsed.method.toLowerCase()}('${parsed.url}', headers=headers, data=data)\n`
+          code += `response = requests.${parsed.method.toLowerCase()}('${parsed.url}'${headerArg}, data=data)\n`
       }
   } else {
-      const headerArg = Object.keys(parsed.headers).length > 0 ? ", headers=headers" : ""
       code += `response = requests.${parsed.method.toLowerCase()}('${parsed.url}'${headerArg})\n`
   }
 

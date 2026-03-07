@@ -23,9 +23,18 @@ export default function Base64EncoderPage() {
       }
 
       if (mode === "encode") {
-        setOutput(btoa(input))
+        // Safe UTF-8 to Base64
+        const utf8Bytes = new TextEncoder().encode(input)
+        const binaryString = String.fromCodePoint(...utf8Bytes)
+        setOutput(btoa(binaryString))
       } else {
-        setOutput(atob(input))
+        // Safe Base64 to UTF-8
+        const binaryString = atob(input)
+        const bytes = new Uint8Array(binaryString.length)
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i)
+        }
+        setOutput(new TextDecoder().decode(bytes))
       }
       setError(null)
     } catch {
